@@ -1,4 +1,5 @@
 class Article{
+
   String title;
   String author;
   String description;
@@ -7,6 +8,6 @@ class Article{
   String content;
   String articleUrl;
 
-  Article({this.title, this.author, this.description, this.urlToImage,
-      this.publshedAt, this.content, this.articleUrl});
+  Article({this.title,this.description,this.author,this.content,this.publshedAt,
+    this.urlToImage, this.articleUrl});
 }

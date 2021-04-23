@@ -12,9 +12,9 @@ class NewsTile extends StatelessWidget {
     return GestureDetector(
       onTap: (){
         Navigator.push(context, MaterialPageRoute(
-          builder: (context) => ArticleView(
-            // posturl : posturl
-          )
+            builder: (context) => ArticleView(
+              postUrl: posturl,
+            )
         ));
       },
       child: Container(

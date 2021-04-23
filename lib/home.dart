@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:news_app/data/categories_model.dart';
 import 'package:news_app/helper/News.dart';
@@ -11,22 +13,28 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool _loading;
   List<CategoriesModel> categories = [];
-  var newlist;
+  var newslist;
 
-  void getNews() async{
+  void getNews() async {
     News news = News();
     await news.getNews();
-    newlist = news.news;
-    // setState(() {
-    //   _loading = false;
-    // });
+    newslist = news.news;
+    Timer.periodic(const Duration(seconds: 10), (timer) {
+      setState(() {
+        _loading = false;
+      });
+      timer.cancel();
+    });
   }
 
   @override
   void initState() {
-    // _loading = true;
+    _loading = true;
+    // TODO: implement initState
     super.initState();
+
     categories = getCategories();
     getNews();
   }
@@ -52,35 +60,46 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
-      body: Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            height: 70,
-            child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  return CategoryCard(imageAssetUrl: categories[index].imageAssetUrl,
-                      categoryName: categories[index].categorieName);
-                }),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 16),
-            child: ListView.builder(itemCount: newlist.length, shrinkWrap: true,
-            physics: ClampingScrollPhysics(),
-            itemBuilder: (context, index){
-              return NewsTile(
-                imgUrl: newlist[index].urlToImage ?? "",
-                title: newlist[index].title ?? "",
-                desc: newlist[index].description ?? "",
-                content: newlist[index].content ?? "",
-                posturl: newlist[index].articleUrl ?? "",
-              );
-            },),
-          )
-        ],
-      ),
+      body: _loading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      height: 70,
+                      child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            return CategoryCard(
+                                imageAssetUrl: categories[index].imageAssetUrl,
+                                categoryName: categories[index].categorieName);
+                          }),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 16),
+                      child: ListView.builder(
+                          itemCount: newslist.length,
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return NewsTile(
+                              imgUrl: newslist[index].urlToImage ?? "",
+                              title: newslist[index].title ?? "",
+                              desc: newslist[index].description ?? "",
+                              content: newslist[index].content ?? "",
+                              posturl: newslist[index].articleUrl ?? "",
+                            );
+                          }),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }
